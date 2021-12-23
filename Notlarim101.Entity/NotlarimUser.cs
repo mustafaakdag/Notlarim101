@@ -25,6 +25,8 @@ namespace Notlarim101.Entity
         [Required]
         public Guid ActivateGuid { get; set; }
         public bool IsAdmin { get; set; }
+        [StringLength(30)]
+        public string ProfileImageFileName { get; set; }
 
         public virtual List<Note> Notes { get; set; }
         public virtual List<Comment> Comments { get; set; }
