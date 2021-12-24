@@ -1,0 +1,7 @@
+-Home Kontrol alanından editprofile kısmının viwevini yaptık
+-ValidationStyle Olusturduk (Content içerisinde olusturduk)
+-Editprofile HttpGet ve HttpSet yapısını doldurduk
+-EditProfile içindeki Update yapısını NotlarımUserManager de olusturduk
+-Migration da get-help yazınca migrationda yapabilceğin şeyleri gösteriyor.
+-Homeconrol tarafında delete işlemini yatık removeByıd kısmını notlarımusermanager tarafında olusturduk.
+-layout kısmında yönetim ve kullanıcı navbarında düzenleme yaptık.

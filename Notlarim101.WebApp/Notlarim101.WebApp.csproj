@@ -93,6 +93,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Dersicerik\24-12-21 Ders içerik.txt" />
     <Content Include="Content\bootstrap-grid.css" />
     <Content Include="Content\bootstrap-grid.min.css" />
     <Content Include="Content\bootstrap-grid.rtl.css" />
@@ -112,6 +113,7 @@
     <Content Include="Content\Login-RegisterStyle.css" />
     <Content Include="Content\Site.css" />
     <Content Include="Content\styles.css" />
+    <Content Include="Content\ValidationStyle.css" />
     <Content Include="Global.asax" />
     <Content Include="images\muhammed.jpg" />
     <Content Include="images\User1.jpeg" />
@@ -184,6 +186,7 @@
     <Content Include="Views\Shared\Warning.cshtml" />
     <Content Include="Views\Shared\Info.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
+    <Content Include="Views\Home\EditProfile.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

@@ -215,6 +215,7 @@ namespace Notlarim101.WebApp.Controllers
             }
             return View(res.Result);
         }
+
         public ActionResult Logout()
         {
             Session.Clear();
@@ -223,23 +224,77 @@ namespace Notlarim101.WebApp.Controllers
 
         public ActionResult EditProfile()
         {
-            return View();
+            NotlarimUser currentuser = Session["login"] as NotlarimUser;
+            NotlarimUserManager num = new NotlarimUserManager();
+            BusinessLayerResult<NotlarimUser> res = num.GetUserById(currentuser.Id);
+            if (res.Errors.Count > 30)
+            {
+                ErrorViewModel errorNotifyObj = new ErrorViewModel()
+                {
+                    Title = "Hata oluştu",
+                    İtems = res.Errors
+                };
+                return View("Error", errorNotifyObj);
+            }
+            return View(res.Result);
         }
         [HttpPost]
-        public ActionResult EditProfile(int id)
+        public ActionResult EditProfile(NotlarimUser model,HttpPostedFileBase ProfileImage)
         {
-            return View();
+            ModelState.Remove("ModifiedUsurname");
+            if (ModelState.IsValid)
+            {
+                if (ProfileImage!=null &&
+                    (ProfileImage.ContentType=="image/jpeg" ||
+                    ProfileImage.ContentType=="image/jpg"||
+                    ProfileImage.ContentType=="image/png"))
+                {
+                    string filename = $"user_{model.Id}.{ProfileImage.ContentType.Split('/')[1]}";
+                    ProfileImage.SaveAs(Server.MapPath($"~/images/{filename}"));
+                    model.ProfileImageFileName = filename;
+                }
+                NotlarimUserManager num = new NotlarimUserManager();
+                BusinessLayerResult<NotlarimUser> res = num.UpdateProfile(model);
+                if (res.Errors.Count > 30)
+                {
+                    ErrorViewModel errorNotifyObj = new ErrorViewModel()
+                    {
+                        Title = "Profil Güncellenemedi!!d",
+                        İtems = res.Errors,
+                        RedirectingUrl="/Hpme/EditProfile"
+                    };
+                    return View("Error", errorNotifyObj);
+                }
+                Session["login"] = res.Result;
+                return RedirectToAction("ShowProfile");
+
+            }
+            return View(model);
         }
 
         public ActionResult DeleteProfile()
         {
-            return View();
+            NotlarimUser currentuser = Session["login"] as NotlarimUser;
+            NotlarimUserManager num = new NotlarimUserManager();
+            BusinessLayerResult<NotlarimUser> res = num.RemoveUserById(currentuser.Id);
+            if (res.Errors.Count > 30)
+            {
+                ErrorViewModel errorNotifyObj = new ErrorViewModel()
+                {
+                    Title = "Profil Silinemedi",
+                    İtems = res.Errors,
+                    RedirectingUrl="/Home/ShowProfile"
+                };
+                return View("Error", errorNotifyObj);
+            }
+            Session.Clear();
+            return RedirectToAction("Index");
         }
-        [HttpPost]
-        public ActionResult DeleteProfile(int id)
-        {
-            return View();
-        }
+        //[HttpPost]
+        //public ActionResult DeleteProfile(int id)
+        //{
+        //    return View();
+        //}
         //public ActionResult TestNotify()
         //{
         //    ErrorViewModel model

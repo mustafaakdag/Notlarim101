@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
@@ -9,17 +10,17 @@ using System.Threading.Tasks;
 namespace Notlarim101.Entity
 {
     [Table("tblNotlarimUsers")]
-    public class NotlarimUser:MyEntityBase
+    public class NotlarimUser : MyEntityBase
     {
-        [StringLength(30)]
+        [DisplayName("Ad") ,StringLength(30, ErrorMessage = "{0}) alani max {1} karakter olmalıdır."), Required]
         public string Name { get; set; }
-        [StringLength(30)]
+        [DisplayName("Soyad"), StringLength(30, ErrorMessage = "{0}) alani max {1} karakter olmalıdır."), Required]
         public string Surname { get; set; }
-        [StringLength(30),Required]
+        [DisplayName("Kullamıcı Adı") ,StringLength(30, ErrorMessage = "{0}) alani max {1} karakter olmalıdır."), Required]
         public string Username { get; set; }
-        [StringLength(100),Required]
+        [DisplayName("E-mail"), StringLength(100, ErrorMessage = "{0}) alani max {1} karakter olmalıdır."), Required]
         public string Email { get; set; }
-        [StringLength(100),Required]
+        [DisplayName("Şifre"),StringLength(100, ErrorMessage = "{0}) alani max {1} karakter olmalıdır."), Required]
         public string Password { get; set; }
         public bool IsActive { get; set; }
         [Required]
@@ -31,7 +32,6 @@ namespace Notlarim101.Entity
         public virtual List<Note> Notes { get; set; }
         public virtual List<Comment> Comments { get; set; }
         public virtual List<Liked> Likes { get; set; }
-
 
     }
 }
