@@ -14,6 +14,10 @@ namespace Notlarim101.WebApp.Controllers
 {
     public class HomeController : Controller
     {
+        NoteManager nm = new NoteManager();
+        CategoryManager cm = new CategoryManager();
+        NotlarimUserManager num = new NotlarimUserManager();
+        BusinessLayerResult<NotlarimUser> res;
         // GET: Home
         public ActionResult Index()
         {
@@ -22,10 +26,8 @@ namespace Notlarim101.WebApp.Controllers
             ////test.UpdateTest();
             ////test.DeleteTest();
             //test.CommentTest();
-
-            NoteManager nm = new NoteManager();
             
-            return View(nm.GetAllNotes().OrderByDescending(s=>s.ModifiedOn).ToList());
+            return View(nm.QList().OrderByDescending(s=>s.ModifiedOn).ToList());
         }
 
         
@@ -36,35 +38,10 @@ namespace Notlarim101.WebApp.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            CategoryManager cm = new CategoryManager();
-            Category cat = cm.GetCategoryById(id.Value);
+            List<Note> notes = nm.QList().Where(x => x.IsDraft == false && x.CategoryId == id).OrderByDescending(x => x.ModifiedOn).ToList();
 
-            if (cat == null)
-            {
-                return HttpNotFound();
-            }
-
-            return View("Index", cat.Notes.OrderByDescending(s => s.ModifiedOn).ToList());
+            return View("Index", notes);
         }
-        
-        public ActionResult ByCategoryTitle(string id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-
-            CategoryManager cm = new CategoryManager();
-            Category cat = cm.GetCategoryByTitle(id);
-
-            if (cat == null)
-            {
-                return HttpNotFound();
-            }
-
-            return View("Index", cat.Notes.OrderByDescending(s => s.ModifiedOn).ToList());
-        }
-
         public ActionResult Login()
         {
             return View();
@@ -74,8 +51,7 @@ namespace Notlarim101.WebApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                NotlarimUserManager num = new NotlarimUserManager();
-                BusinessLayerResult<NotlarimUser> res = num.LoginUser(model);
+                res = num.LoginUser(model);
                 if (res.Errors.Count>0)
                 {
                     if (res.Errors.Find(x=>x.Code==ErrorMessageCode.UserIsNotActive)!=null)
@@ -103,8 +79,7 @@ namespace Notlarim101.WebApp.Controllers
             //bool hasError = false;
             if (ModelState.IsValid)
             {
-                NotlarimUserManager num = new NotlarimUserManager();
-                BusinessLayerResult<NotlarimUser> res = num.RegisterUser(model);
+                res = num.RegisterUser(model);
 
                 if (res.Errors.Count>0)
                 {
@@ -181,8 +156,7 @@ namespace Notlarim101.WebApp.Controllers
 
         public ActionResult UserActivate(Guid id)
         {
-            NotlarimUserManager num = new NotlarimUserManager();
-            BusinessLayerResult<NotlarimUser> res = num.ActivateUser(id);
+            res = num.ActivateUser(id);
             if (res.Errors.Count>0)
             {
                 TempData["errors"] = res.Errors;
@@ -206,12 +180,19 @@ namespace Notlarim101.WebApp.Controllers
 
         public ActionResult ShowProfile()
         {
-            NotlarimUser currentuser = Session["login"] as NotlarimUser;
-            NotlarimUserManager num = new NotlarimUserManager();
-            BusinessLayerResult<NotlarimUser> res = num.GetUserById(currentuser.Id);
+            //NotlarimUser currentuser = Session["login"] as NotlarimUser;
+            //if(currentuser!=null) res = num.GetUserById(currentuser.Id);
+
+            if(Session["login"] is NotlarimUser currentuser) res= num.GetUserById(currentuser.Id);
             if (res.Errors.Count>0)
             {
-                //Kullanıcıyı hata ekranına yonlendirelecek
+                ErrorViewModel errorNotifyObj = new ErrorViewModel()
+                {
+                    Title = "Hata oluştu",
+                    İtems = res.Errors,
+                };
+
+                return View("Error", errorNotifyObj);
             }
             return View(res.Result);
         }
@@ -224,9 +205,9 @@ namespace Notlarim101.WebApp.Controllers
 
         public ActionResult EditProfile()
         {
-            NotlarimUser currentuser = Session["login"] as NotlarimUser;
-            NotlarimUserManager num = new NotlarimUserManager();
-            BusinessLayerResult<NotlarimUser> res = num.GetUserById(currentuser.Id);
+            //NotlarimUser currentuser = Session["login"] as NotlarimUser;
+            // res = num.GetUserById(currentuser.Id);
+            if (Session["login"] is NotlarimUser currentuser) res = num.GetUserById(currentuser.Id);
             if (res.Errors.Count > 30)
             {
                 ErrorViewModel errorNotifyObj = new ErrorViewModel()
@@ -252,9 +233,8 @@ namespace Notlarim101.WebApp.Controllers
                     string filename = $"user_{model.Id}.{ProfileImage.ContentType.Split('/')[1]}";
                     ProfileImage.SaveAs(Server.MapPath($"~/images/{filename}"));
                     model.ProfileImageFileName = filename;
-                }
-                NotlarimUserManager num = new NotlarimUserManager();
-                BusinessLayerResult<NotlarimUser> res = num.UpdateProfile(model);
+                };
+                res = num.UpdateProfile(model);
                 if (res.Errors.Count > 30)
                 {
                     ErrorViewModel errorNotifyObj = new ErrorViewModel()
@@ -274,9 +254,7 @@ namespace Notlarim101.WebApp.Controllers
 
         public ActionResult DeleteProfile()
         {
-            NotlarimUser currentuser = Session["login"] as NotlarimUser;
-            NotlarimUserManager num = new NotlarimUserManager();
-            BusinessLayerResult<NotlarimUser> res = num.RemoveUserById(currentuser.Id);
+            if (Session["login"] is NotlarimUser currentuser) res = num.RemoveUserById(currentuser.Id);
             if (res.Errors.Count > 30)
             {
                 ErrorViewModel errorNotifyObj = new ErrorViewModel()

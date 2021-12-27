@@ -10,14 +10,13 @@ using Notlarim101.Entity;
 
 namespace Notlarim101.BusinessLayer
 {
-    public class NoteManager//:ManagerBase<Note>
+    public class NoteManager:ManagerBase<Note>
     {
-        private Repository<Note> rnote = new Repository<Note>();
 
-        public List<Note> GetAllNotes()
-        {
-            return rnote.List();
-        }
+        //public List<Note> GetAllNotes()
+        //{
+        //    return rnote.List();
+        //}
 
     }
 }
